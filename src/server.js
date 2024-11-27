@@ -1,16 +1,18 @@
 require("express-async-errors")
 const express = require("express")
-const app = express()
 const AppError = require("./utils/AppError")
-
-app.use(express.json())
-
 const routes = require("./routes")
+const migrationsRun = require("./database/sqlite/migrations")
+
+const app = express()
+app.use(express.json())
 
 const PORT = 3333
 
 // inicializando app, e redirecionando requisição para arota
 app.use(routes)
+
+migrationsRun()
 
 // utilizando AppError para tratar erro tanto do lado do cliente quanto do server
 app.use(( error, request, response, next ) => {

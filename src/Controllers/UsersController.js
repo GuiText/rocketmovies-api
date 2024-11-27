@@ -1,15 +1,24 @@
+const sqliteConnection = require("../database/sqlite")
 const AppError = require("../utils/AppError")
 
 class UsersController {
-  create(request, response) {
+  async create(request, response) {
       const { name, email, password } = request.body
 
-      // tratando erro se nome, email ou senha não forem informados
-      if(!name || !email || !password) {
-        throw new AppError("Nome e email e senha são obrigatórios para fazer o cadastro")
+      const database = await sqliteConnection()
+
+      const checkUsersExists = await database.get("SELECT * FROM users WHERE email = (?)", [email])
+
+      if(checkUsersExists) {
+        throw new AppError("E-mail já cadastrado para outro usuário")
       }
-    
-      response.status(201).json({ name, email, password })
+
+      await database.run("INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+        [ name, email, password ]
+      )
+
+      return response.status(201).json()
+
     }
 }
 
