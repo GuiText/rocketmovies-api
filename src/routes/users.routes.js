@@ -5,5 +5,6 @@ const usersController = new UsersController()
 
 // redirecionando a requisição feita na rota para o controller
 usersRoutes.post("/", usersController.create)
+usersRoutes.put("/:id", usersController.update)
 
 module.exports = usersRoutes
