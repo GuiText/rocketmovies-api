@@ -39,8 +39,14 @@ class UsersController {
 
       const userWithUpdatedEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email])
 
-      if(userWithUpdatedEmail && userWithUpdatedEmail.id !== id) {
-        throw new AppError("E-mail já cadastrado para outro usuário ")
+      if(userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id) {
+        throw new AppError("E-mail já cadastrado para outro usuário")
+      }
+      user.name = name
+      user.email = email
+
+      if(password && !old_password) {
+        throw new AppError("Você precisa informar a senha antiga")
       }
 
       if(password && old_password) {
@@ -53,8 +59,6 @@ class UsersController {
         user.password = await hash(password, 8)
       }
 
-      user.name = name
-      user.email = email
 
       await database.run(`
           UPDATE users SET
